@@ -22,6 +22,27 @@ else
 fi
 
 TYPE="$1"
+ap () {
+   git add -A
+   read -p "Add commit message here. -->" MSSG
+   git commit -a -m "$MSSG"
+   read -p "Are you sure? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+   rm -rf ~/.pac/branch
+   echo "Please enter the branch you want to upload to (ex. cm-10.2):"
+   read BRANCH
+   echo $BRANCH > ~/.pac/branch
+   BRANCH=$(cat ~/.pac/branch)
+   echo "Your new current branch is: $(cat ~/.pac/branch)"
+
+PROJECT=$(grep PAC-man .git/config | awk -F/ '{print $NF}')
+
+   git push ssh://$USER@review.pac-rom.com:29418/$PROJECT HEAD:refs/\for/$BRANCH
+else
+  echo "Canceled"
+fi
+}
+
 push () {
  read -p "Are you sure? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
@@ -39,6 +60,7 @@ else
   echo "Canceled"
 fi
 }
+
 name () {
    echo "Enter an option:"
    echo "   1. View your current gerrit username"
@@ -93,6 +115,7 @@ error () {
    echo "   name   (-n) --- View or edit your gerrit username"
    echo "   update (-u) --- Check for an update and download it if there is one available (use uf to force)"
    echo "   push   (-p) --- Push to gerrit"
+   echo "   add files, message, and push   (-ap) --- Add and push to gerrit"
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
@@ -106,8 +129,8 @@ case $TYPE in
    -n|name)name;;
    -u|update)update;;
    -p|push)push;;
-   *|help)error;;
    -h|help)error;;
    -help|help)error;;
+   -ap|add+push)ap;;
    -uf)uf;;
 esac
