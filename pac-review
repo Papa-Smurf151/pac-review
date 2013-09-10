@@ -84,7 +84,7 @@ else
 fi
 }
 
-name ()
+name () {
    echo "Enter an option:"
    echo "   1. View your current gerrit username"
    echo "   2. Enter a new gerrit username"
@@ -139,6 +139,7 @@ error () {
    echo "   update (-u) --- Check for an update and download it if there is one available (use uf to force)"
    echo "   push   (-p) --- Push to gerrit"
    echo "   add files, message, and push   (-ap) --- Add and push to gerrit"
+   echo "   Change-ID (-scp) --- Generate Change-ID for commit"
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
