@@ -133,4 +133,5 @@ case $TYPE in
    -help|help)error;;
    -ap|add+push)ap;;
    -uf)uf;;
+   *|help)error;;
 esac
