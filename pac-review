@@ -68,7 +68,7 @@ if [ "$RESPc" = "n" ]; then
    read -p "Is the Change-ID there? (y/n)" RESPe
 if [ "$RESPe" = "n" ]; then
    echo "then please run {scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/} as something is not working"
-if [ "$RESPc, $RESPe" = "y" ]
+if [ "$RESPc, $RESPe" = "y" ]; then
    read -p "Do you want to now push? (y/n)" RESPp
 if [ "$RESPp" = "y" ]; then
    rm -rf ~/.pac/branch
