@@ -1,13 +1,13 @@
 #!/bin/bash
 
-#################################
-#                               #
-# Created by Sniper for PAC-man #
-#                               #
-#################################
+#############################################
+#                                           #
+# Created by Sniper/Goldflame09 for PAC-man #
+#                                           #
+#############################################
 
-VERSION=0.8
-BUILD=8
+VERSION=0.9
+BUILD=9
 
 if [ -e ~/.pac/username ]
 then
@@ -21,43 +21,24 @@ else
    echo "Your new gerrit username is: $(cat ~/.pac/username)"
 fi
 
-if [ -e ~/.pac/branch ]
-then
-   BRANCH=$(cat ~/.pac/branch)
-else
+TYPE="$1"
+push () {
+ read -p "Are you sure? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+   rm -rf ~/.pac/branch
    echo "Please enter the branch you want to upload to (ex. cm-10.2):"
    read BRANCH
    echo $BRANCH > ~/.pac/branch
    BRANCH=$(cat ~/.pac/branch)
    echo "Your new current branch is: $(cat ~/.pac/branch)"
-fi
 
-
-TYPE="$1"
 PROJECT=$(grep PAC-man .git/config | awk -F/ '{print $NF}')
 
-push () {
    git push ssh://$USER@review.pac-rom.com:29418/$PROJECT HEAD:refs/\for/$BRANCH
+else
+  echo "Canceled"
+fi
 }
-
-branch () {
-   echo "Enter an option:"
-   echo "   1. View your current branch"
-   echo "   2. Enter a new current branch"
-   read BRANCH
-   case $BRANCH in
-      1|1.)
-         echo "Your current branch is: $(cat ~/.pac/branch)";;
-      2|2.)
-         echo "Enter your new current branch:"
-         read BRANCH
-         echo $BRANCH > ~/.pac/branch
-         BRANCH=$(cat ~/.pac/branch)
-         echo "Your new current branch is: $(cat ~/.pac/branch)";;
-      *) echo "You did not choose a valid option (1 or 2)";;
-   esac
-}
-
 name () {
    echo "Enter an option:"
    echo "   1. View your current gerrit username"
@@ -109,24 +90,24 @@ uf () {
 error () {
    echo " "
    echo "Please choose an option:"
-   echo "   branch (b) --- View or edit your current branch"
-   echo "   name   (n) --- View or edit your gerrit username"
-   echo "   push   (p) --- Push to gerrit"
-   echo "   update (u) --- Check for an update and download it if there is one available (use uf to force)"
+   echo "   name   (-n) --- View or edit your gerrit username"
+   echo "   update (-u) --- Check for an update and download it if there is one available (use uf to force)"
+   echo "   push   (-p) --- Push to gerrit"
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
-   echo "   1. Your current branch is correct (using the branch option)"
+   echo "   1. Your current branch is correct"
    echo "   2. Your public ssh key is attached to your gerrit profile"
    echo " "
    echo "If you still encounter problems, ask on the official PAC-man forum at forum.pac-rom.com"
 }
 
 case $TYPE in
-   b|branch)branch;;
-   p|push)push;;
-   n|name)name;;
-   u|update)update;;
-   uf)uf;;
-   *)error;;
+   -n|name)name;;
+   -u|update)update;;
+   -p|push)push;;
+   *|help)error;;
+   -h|help)error;;
+   -help|help)error;;
+   -uf)uf;;
 esac
