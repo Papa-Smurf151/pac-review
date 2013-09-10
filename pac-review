@@ -9,8 +9,7 @@
 VERSION=0.9
 BUILD=9
 
-if [ -e ~/.pac/username ]
-then
+if [ -e ~/.pac/username ]; then
    USER=$(cat ~/.pac/username)
 else
    echo "Please enter your gerrit username:"
@@ -24,7 +23,8 @@ fi
 TYPE="$1"
 ap () {
    git add -A
-   read -p "Add commit message here. -->" MSSG
+   read -p "Add commit message below.
+" MSSG
    git commit -a -m "$MSSG"
    read -p "Are you sure? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
@@ -34,9 +34,7 @@ if [ "$RESP" = "y" ]; then
    echo $BRANCH > ~/.pac/branch
    BRANCH=$(cat ~/.pac/branch)
    echo "Your new current branch is: $(cat ~/.pac/branch)"
-
-PROJECT=$(grep PAC-man .git/config | awk -F/ '{print $NF}')
-
+   PROJECT=$(grep PAC-man .git/config | awk -F/ '{print $NF}')
    git push ssh://$USER@review.pac-rom.com:29418/$PROJECT HEAD:refs/\for/$BRANCH
 else
   echo "Canceled"
@@ -52,16 +50,41 @@ if [ "$RESP" = "y" ]; then
    echo $BRANCH > ~/.pac/branch
    BRANCH=$(cat ~/.pac/branch)
    echo "Your new current branch is: $(cat ~/.pac/branch)"
-
-PROJECT=$(grep PAC-man .git/config | awk -F/ '{print $NF}')
-
+   PROJECT=$(grep PAC-man .git/config | awk -F/ '{print $NF}')
    git push ssh://$USER@review.pac-rom.com:29418/$PROJECT HEAD:refs/\for/$BRANCH
 else
   echo "Canceled"
 fi
 }
 
-name () {
+hooks () {
+   echo "Adding Commit-ID"
+   scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/
+   git commit --amend
+   read -p "Is the Change-ID there? (y/n)" RESPc
+if [ "$RESPc" = "n" ]; then
+   scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/
+   git commit --amend
+   read -p "Is the Change-ID there? (y/n)" RESPe
+if [ "$RESPe" = "n" ]; then
+   echo "then please run {scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/} as something is not working"
+if [ "$RESPc, $RESPe" = "y" ]
+   read -p "Do you want to now push? (y/n)" RESPp
+if [ "$RESPp" = "y" ]; then
+   rm -rf ~/.pac/branch
+   echo "Please enter the branch you want to upload to (ex. cm-10.2):"
+   read BRANCH
+   echo $BRANCH > ~/.pac/branch
+   BRANCH=$(cat ~/.pac/branch)
+   echo "Your new current branch is: $(cat ~/.pac/branch)"
+   PROJECT=$(grep PAC-man .git/config | awk -F/ '{print $NF}')
+   git push ssh://$USER@review.pac-rom.com:29418/$PROJECT HEAD:refs/\for/$BRANCH
+else
+   echo "Canceled"
+fi
+}
+
+name ()
    echo "Enter an option:"
    echo "   1. View your current gerrit username"
    echo "   2. Enter a new gerrit username"
@@ -129,6 +152,7 @@ case $TYPE in
    -n|name)name;;
    -u|update)update;;
    -p|push)push;;
+   -scp|hooks)hooks;;
    -h|help)error;;
    -help|help)error;;
    -ap|add+push)ap;;
