@@ -26,12 +26,7 @@ ap () {
    read -p "Add commit message below.
 " MSSG
    git commit -a -m "$MSSG"
-   read -p "Are you sure? (y/n) " RESP
-if [ "$RESP" = "y" ]; then
    push
-else
-  echo "Canceled"
-fi
 }
 
 push () {
