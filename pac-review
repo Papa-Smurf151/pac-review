@@ -30,7 +30,7 @@ ap () {
 }
 
 push () {
- read -p "Are you sure you want to push? (y/n) " RESP
+ read -p "Are you sure you want to push? (y/n):" RESP
 if [ "$RESP" = "y" ]; then
    rm -rf ~/.pac/branch
    echo "Please enter the branch you want to upload to (ex. cm-10.2):"
@@ -46,24 +46,24 @@ fi
 }
 
 hooks () {
-   echo "Adding Commit-ID"
+echo "Adding Commit-ID"
    scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/
    git commit --amend
-   read -p "Is the Change-ID there? (y/n)" RESPc
-if [ "$RESPc" = "n" ]; then
-   scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/
+read -p "Is the Change-ID there? (y/n):" RESPc
+case $RESPc in
+   y) push ;;
+   n) scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/
    git commit --amend
-   read -p "Is the Change-ID there? (y/n)" RESPe
-elif [ "$RESPe" = "n" ]; then
-   echo "then please run {scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/} as something is not working"
-elif [ "$RESPc" = "y" ]; then
-   push
-elif [ "$RESPe" = "y" ]; then
-   push
-else
-   echo "Canceled"
-fi
+read -p "Is the Change-ID there? (y/n):" RESPe
+case $RESPe in
+   y) push ;;
+   n) echo "then please run {scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/} as something is not working" ;;
+   *) echo "Canceled"
+esac ;;
+   *) echo "Canceled" ;;
+esac
 }
+
 
 amend () {
    read -p "Have you edited the files?/Do you want to change commit message? (y/n):" RESPa
@@ -151,10 +151,10 @@ error () {
    echo "   name   (-n) --- View or edit your gerrit username"
    echo "   update (-u) --- Check for an update and download it if there is one available (use uf to force)"
    echo "   push   (-p) --- Push to gerrit"
-   echo "   add files, message, and push   (-ap) --- Add and push to gerrit"
-   echo "   Change-ID (-scp) --- Generate Change-ID for commit"
-   echo "   Amend  (-am) --- Amend the commit and push"
-   echo "   SSH Keygen (-ssh) --- Create/show SSH key to put on Gerrit"
+   echo "   add+push   (-ap) --- Add and push to gerrit"
+   echo "   hooks (-scp) --- Generate Change-ID for commit"
+   echo "   amend  (-am) --- Amend the commit and push"
+   echo "   sshkey (-ssh) --- Create/show SSH key to put on Gerrit"
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
