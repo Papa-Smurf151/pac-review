@@ -64,7 +64,6 @@ esac ;;
 esac
 }
 
-
 amend () {
    read -p "Have you edited the files?/Do you want to change commit message? (y/n):" RESPa
 if [ "$RESPa" = "y" ]; then
