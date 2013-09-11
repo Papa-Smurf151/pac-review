@@ -66,11 +66,11 @@ if [ "$RESPc" = "n" ]; then
    scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/
    git commit --amend
    read -p "Is the Change-ID there? (y/n)" RESPe
-if [ "$RESPe" = "n" ]; then
+elif [ "$RESPe" = "n" ]; then
    echo "then please run {scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/} as something is not working"
-if [ "$RESPc, $RESPe" = "y" ]; then
+elif [ "$RESPc, $RESPe" = "y" ]; then
    read -p "Do you want to now push? (y/n)" RESPp
-if [ "$RESPp" = "y" ]; then
+elif [ "$RESPp" = "y" ]; then
    rm -rf ~/.pac/branch
    echo "Please enter the branch you want to upload to (ex. cm-10.2):"
    read BRANCH
