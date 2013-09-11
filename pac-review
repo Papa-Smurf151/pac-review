@@ -106,9 +106,7 @@ read -p "Press [Enter] to open file..."
    gnome-open .ssh/id_rsa.pub
 else
    ssh-keygen
-   echo "SSH Key already exists.
-
-Go to PAC Gerrit (review.pac-rom.com), sign in, go to settings, 
+   echo "Go to PAC Gerrit (review.pac-rom.com), sign in, go to settings, 
 and click on SSH Public Keys. 
 
 Click on add SSH Key and copy and paste contents of file from .ssh/id_rsa.pub."
