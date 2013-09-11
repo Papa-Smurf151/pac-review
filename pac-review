@@ -117,6 +117,14 @@ read -p "Press [Enter] to open file..."
 fi
 }
 
+new () {
+   cd ~/.pac
+   curl http://pac-rom.com/downloads/pac-review > .new
+   sed -e '12,132d' .new > .tmp
+   NEWB=$(grep BUILD= .tmp | sed "s/BUILD=//g")
+   NEWV=$(grep VERSION= .tmp | sed "s/VERSION=//g")
+}
+
 update () {
    new
    if [ $BUILD = "$NEWB" ]
