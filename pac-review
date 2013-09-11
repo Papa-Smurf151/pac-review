@@ -94,12 +94,27 @@ name () {
    esac
 }
 
-new () {
-   cd ~/.pac
-   curl http://pac-rom.com/downloads/pac-review > .new
-   sed -e '12,132d' .new > .tmp
-   NEWB=$(grep BUILD= .tmp | sed "s/BUILD=//g")
-   NEWV=$(grep VERSION= .tmp | sed "s/VERSION=//g")
+sshkey () {
+if [ -e ~/.ssh/id_rsa.pub ]; then
+   echo "SSH Key already exists.
+
+Go to PAC Gerrit (review.pac-rom.com), sign in, go to settings, 
+and click on SSH Public Keys. 
+
+Click on add SSH Key and copy and paste contents of file from .ssh/id_rsa.pub."
+read -p "Press [Enter] to open file..."
+   gnome-open .ssh/id_rsa.pub
+else
+   ssh-keygen
+   echo "SSH Key already exists.
+
+Go to PAC Gerrit (review.pac-rom.com), sign in, go to settings, 
+and click on SSH Public Keys. 
+
+Click on add SSH Key and copy and paste contents of file from .ssh/id_rsa.pub."
+read -p "Press [Enter] to open file..."
+   gnome-open .ssh/id_rsa.pub
+fi
 }
 
 update () {
@@ -133,6 +148,7 @@ error () {
    echo "   add files, message, and push   (-ap) --- Add and push to gerrit"
    echo "   Change-ID (-scp) --- Generate Change-ID for commit"
    echo "   Amend  (-am) --- Amend the commit and push"
+   echo "   SSH Keygen (-ssh) --- Create/show SSH key to put on Gerrit"
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
@@ -147,6 +163,7 @@ case $TYPE in
    -u|update)update;;
    -p|push)push;;
    -scp|hooks)hooks;;
+   -ssh|sshkey)sshkey;;
    -h|help)error;;
    -help|help)error;;
    -ap|add+push)ap;;
