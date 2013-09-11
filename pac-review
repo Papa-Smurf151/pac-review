@@ -56,7 +56,9 @@ if [ "$RESPc" = "n" ]; then
    read -p "Is the Change-ID there? (y/n)" RESPe
 elif [ "$RESPe" = "n" ]; then
    echo "then please run {scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/} as something is not working"
-elif [ "$RESPc, $RESPe" = "y" ]; then
+elif [ "$RESPc" = "y" ]; then
+   push
+elif [ "$RESPe" = "y" ]; then
    push
 else
    echo "Canceled"
@@ -64,7 +66,7 @@ fi
 }
 
 amend () {
-   read -p "Have you edited the files? (y/n):" RESPa
+   read -p "Have you edited the files?/Do you want to change commit message? (y/n):" RESPa
 if [ "$RESPa" = "y" ]; then
    git add -A
    git commit --amend
