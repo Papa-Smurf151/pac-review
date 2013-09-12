@@ -164,7 +164,6 @@ error () {
    echo "   push   	(-p)   --- Push to gerrit"
    echo "   sshkey 	(-ssh) --- Create/show SSH key to put on Gerrit"
    echo "   update 	(-u)   --- Check for, and download an update if one is available"
-
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
