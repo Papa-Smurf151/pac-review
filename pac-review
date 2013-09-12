@@ -168,6 +168,7 @@ error () {
    echo "   3. Your public ssh key is attached to your gerrit profile"
    echo " "
    echo "If you still encounter problems, ask on the official PAC-man forum at:"
+   echo "forum.pac-rom.com"
 
 }
 
