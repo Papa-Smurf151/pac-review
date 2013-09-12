@@ -23,12 +23,15 @@ fi
 
 TYPE="$1"
 ap () {
-   git add -A
-   echo "Add commit message below.
--------------------------"
-   read MSSG
-   git commit -a -m "$MSSG"
-   push
+   git add .
+   echo "Add commit message below."
+   git commit -a
+   read -p "Is there a Change-ID there? (y/n):" RESPi
+case $RESPi in
+   y) push ;;
+   n) hooks ;;
+   *) echo "Canceled"
+esac   
 }
 
 push () {
