@@ -146,14 +146,19 @@ uf () {
 
 error () {
    echo " "
-   echo "Please choose an option:"
-   echo "   name   (-n) --- View or edit your gerrit username"
-   echo "   update (-u) --- Check for an update and download it if there is one available (use uf to force)"
-   echo "   push   (-p) --- Push to gerrit"
-   echo "   add+push   (-ap) --- Add and push to gerrit"
-   echo "   hooks (-scp) --- Generate Change-ID for commit"
-   echo "   amend  (-am) --- Amend the commit and push"
-   echo "   sshkey (-ssh) --- Create/show SSH key to put on Gerrit"
+   echo "Usage: pac-review [-short command]"
+   echo "Or:    pac-review [long comand]"
+   echo " "
+   echo "Commands:"
+   echo "   add+push   	(-ap)  --- Add and push to gerrit"
+   echo "   amend  	(-am)  --- Amend the commit and push"
+   echo "   force	(-uf)  --- Force the script to grab a new version"
+   echo "   hooks 	(-scp) --- Generate Change-ID for commit"
+   echo "   name   	(-n)   --- View or edit your gerrit username"
+   echo "   push   	(-p)   --- Push to gerrit"
+   echo "   sshkey 	(-ssh) --- Create/show SSH key to put on Gerrit"
+   echo "   update 	(-u)   --- Check for, and download an update if one is available"
+
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
@@ -173,6 +178,6 @@ case $TYPE in
    -help|help)error;;
    -ap|add+push)ap;;
    -am|amend)amend;;
-   -uf)uf;;
+   -uf|force)uf;;
    *|help)error;;
 esac
