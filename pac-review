@@ -34,18 +34,27 @@ new_branch() {
 }
 
 ap () {
-   git add .
-   git commit -a
-   push
+git add -A
+   echo "Add commit message below.
+--------------------------"
+   read MSSG
+   git commit -a -m "$MSSG"
+   git commit --amend
+   read -p "Is there a Change-ID there? (y/n):" RESPi
+case $RESPi in
+   y) push ;;
+   n) hooks ;;
+   *) echo "Canceled"
+esac   
 }
 
 push () {
-echo -n "Are you sure? (y/n) "; read RESP
+echo -n "Are you sure you want to push? (y/n): "; read RESP
 if [ "${RESP}" == "y" ] || [ "${RESP}" == "Y" ]; then
 
 	if [ -f ${HOME}/.pac/branch ]; then
   	  echo "Current branch: `cat ${HOME}/.pac/branch`"
-  	  echo "Continue to push to current branch (y/n): "; read CTPUSH
+  	  echo -n "Push to current branch? (y/n): "; read CTPUSH
   		if [ "${CTPUSH}" == "y" ] || [ "${CTPUSH}" == "Y" ]; then
 			BRANCH=`cat ${HOME}/.pac/branch`
   		else
