@@ -1,54 +1,61 @@
 #!/bin/bash
 
-#############################################
-#                                           #
-# Created by Sniper/Goldflame09 for PAC-man #
-#                                           #
-#############################################
+#####################################################
+#                                                   #
+# Created by Sniper/Goldflame09/wedgess for PAC-man #
+#                                                   #
+#####################################################
 
 VERSION=0.9
 BUILD=9
 
-if [ -e ~/.pac/username ]; then
-   USER=$(cat ~/.pac/username)
-else
-   echo "Please enter your gerrit username:
-----------------------------------"
-   read USER
-   mkdir ~/.pac
-   echo $USER > ~/.pac/username
-   USER=$(cat ~/.pac/username)
-   echo "Your new gerrit username is: $(cat ~/.pac/username)"
+if [ ! -d ${HOME}/bin ]; then
+ mkdir -p ${HOME}/bin
+ echo "# Add ~/bin to PATH" >> ${HOME}/.bashrc
+ echo "export PATH=${PATH}:~/bin" >> ${HOME}/.bashrc
 fi
 
-TYPE="$1"
+if [ -f ${HOME}/.pac/username ]; then
+   GUZER=`cat ${HOME}/.pac/username`
+else
+   echo "Please enter your gerrit username: ";read GUZER
+   mkdir -p ${HOME}/.pac
+   echo ${GUZER} > ${HOME}/.pac/username
+   GUZER=`cat ${HOME}/.pac/username`
+   echo "Your new gerrit username is: ${GUZER}"
+fi
+
+new_branch() {
+   rm -f ${HOME}/.pac/branch
+   echo -n "Please enter the branch you want to upload to (ex. cm-10.2): "; read BRANCH
+   echo ${BRANCH} > ${HOME}/.pac/branch
+   BRANCH=`cat ${HOME}/.pac/branch`
+   echo "Your new current branch is: ${BRANCH}"
+}
+
 ap () {
-git add -A
-   echo "Add commit message below.
---------------------------"
-   read MSSG
-   git commit -a -m "$MSSG"
-   git commit --amend
-   read -p "Is there a Change-ID there? (y/n):" RESPi
-case $RESPi in
-   y) push ;;
-   n) hooks ;;
-   *) echo "Canceled"
-esac   
+   git add .
+   git commit -a
+   push
 }
 
 push () {
- read -p "Are you sure you want to push? (y/n):" RESP
-if [ "$RESP" = "y" ]; then
-   rm -rf ~/.pac/branch
-   echo "Please enter the branch you want to upload to (ex. cm-10.2):
-------------------------------------------------------------"
-   read BRANCH
-   echo $BRANCH > ~/.pac/branch
-   BRANCH=$(cat ~/.pac/branch)
-   echo "Your new current branch is: $(cat ~/.pac/branch)"
-   PROJECT=$(grep PAC-man .git/config | awk -F/ '{print $NF}')
-   git push ssh://$USER@review.pac-rom.com:29418/$PROJECT HEAD:refs/\for/$BRANCH
+echo -n "Are you sure? (y/n) "; read RESP
+if [ "${RESP}" == "y" ] || [ "${RESP}" == "Y" ]; then
+
+	if [ -f ${HOME}/.pac/branch ]; then
+  	  echo "Current branch: `cat ${HOME}/.pac/branch`"
+  	  echo "Continue to push to current branch (y/n): "; read CTPUSH
+  		if [ "${CTPUSH}" == "y" ] || [ "${CTPUSH}" == "Y" ]; then
+			BRANCH=`cat ${HOME}/.pac/branch`
+  		else
+			new_branch
+  		fi
+	else
+	  new_branch
+	fi
+    PROJECT=`grep PAC-man .git/config | awk -F/ '{print $NF}'`
+    git push ssh://${GUZER}@review.pac-rom.com:29418/${PROJECT} HEAD:refs/\for/${BRANCH}
 else
   echo "Canceled"
 fi
@@ -56,18 +63,18 @@ fi
 
 hooks () {
 echo "Adding Commit-ID"
-   scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/
+   scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
    git commit --amend
-read -p "Is the Change-ID there? (y/n):" RESPc
-case $RESPc in
+echo -n "Is the Change-ID there? (y/n):"; read RESPc
+case ${RESPc} in
    y) push ;;
-   n) scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/
+   n) scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
    git commit --amend
-read -p "Is the Change-ID there? (y/n):" RESPe
-case $RESPe in
+echo -n "Is the Change-ID there? (y/n):"; read RESPe 
+case ${RESPe} in
    y) push ;;
    n) echo "then please run: 
-{scp -p -P 29418 $USER@review.pac-rom.com:hooks/commit-msg .git/hooks/} 
+{scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/} 
 as something is not working" ;;
    *) echo "Canceled"
 esac ;;
@@ -76,8 +83,8 @@ esac
 }
 
 amend () {
-   read -p "Have you edited the files?/Do you want to change commit message? (y/n):" RESPa
-if [ "$RESPa" = "y" ]; then
+   echo -n "Have you edited the files?/Do you want to change commit message? (y/n):"; read RESPa
+if [ "${RESPa}" == "y" ] || [ "${RESPa}" == "Y" ]; then
    git add -A
    git commit --amend
    push
@@ -91,22 +98,20 @@ name () {
    echo "   1. View your current gerrit username"
    echo "   2. Enter a new gerrit username"
    read NAME
-   case $NAME in
+   case ${NAME} in
       1|1.)
-         echo "Your current gerrit username is: $(cat ~/.pac/username)";;
+         echo "Your current gerrit username is: `cat ~/.pac/username`";;
       2|2.)
-         echo "Enter your new gerrit username:
--------------------------------"
-         read USER
-         echo $USER > ~/.pac/username
-         USER=$(cat ~/.pac/username)
-         echo "Your new gerrit username is: $(cat ~/.pac/username)";;
-      *) echo "You did not choose a valid option (1 or 2)";;
+         echo -n "Enter your new gerrit username: "; read GUZER
+         echo ${GUZER} > ${HOME}/.pac/username
+         GUZER=`cat ${HOME}/.pac/username`
+         echo "Your new gerrit username is: ${GUZER}";;
+      *) echo "${NAME} is not a valid option (Choose 1 or 2)";;
    esac
 }
 
 sshkey () {
-if [ -e ~/.ssh/id_rsa.pub ]; then
+if [ -e ${HOME}/.ssh/id_rsa.pub ]; then
    echo "SSH Key already exists.
 
 Go to PAC Gerrit (http://review.pac-rom.com), sign in, go to settings, 
@@ -114,7 +119,7 @@ and click on SSH Public Keys. Use Control + Click to open URL.
 
 Click on add SSH Key and copy and paste contents of file from .ssh/id_rsa.pub."
 read -p "Press [Enter] to open file..."
-   gnome-open .ssh/id_rsa.pub
+   gnome-open ${HOME}/.ssh/id_rsa.pub
 else
    ssh-keygen
    echo "Go to PAC Gerrit (http://review.pac-rom.com), sign in, go to settings, 
@@ -122,38 +127,35 @@ and click on SSH Public Keys. Use Control + Click to open URL.
 
 Click on add SSH Key and copy and paste contents of file from .ssh/id_rsa.pub."
 read -p "Press [Enter] to open file..."
-   gnome-open .ssh/id_rsa.pub
+   gnome-open ${HOME}/.ssh/id_rsa.pub
 fi
 }
 
 new () {
-   cd ~/.pac
-   curl http://pac-rom.com/downloads/pac-review > .new
-   sed -e '12,132d' .new > .tmp
-   NEWB=$(grep BUILD= .tmp | sed "s/BUILD=//g")
-   NEWV=$(grep VERSION= .tmp | sed "s/VERSION=//g")
+   curl http://pac-rom.com/downloads/pac-review > ${HOME}/.pac/.new
+   sed -i '12,132d' ${HOME}/.pac/.new
+   NEWB=`grep BUILD= ${HOME}/.pac/.new | sed "s/BUILD=//g"`
+   NEWV=`grep VERSION= ${HOME}/.pac/.new | sed "s/VERSION=//g"`
 }
 
 update () {
    new
-   if [ $BUILD = "$NEWB" ]
-   then
-      echo "Already up to date (v$VERSION)"
-   elif [ "$BUILD" -lt "$NEWB" ]
-   then
-      cp .new ~/bin/pac-review
-      echo "Successfully updated to v$NEWV!"
+   if [ "${BUILD}" == "${NEWB}" ]; then
+      echo; echo "Already up to date (v${VERSION})"
+   elif [[ "${BUILD}" -lt "${NEWB}" ]]; then
+      mv ${HOME}/.pac/.new ${HOME}/bin/pac-review
+      chmod +x ${HOME}/bin/pac-review
+      echo; echo "Successfully updated to v${NEWV}!"
    else
       echo "You Cheated!"
    fi
-   rm .new .tmp
 }
 
 uf () {
    new
-   cp .new ~/bin/pac-review
-   rm .new
-   echo "Forced update to v$NEWV!"
+   mv ${HOME}/.pac/.new ${HOME}/bin/pac-review
+   chmod +x ${HOME}/bin/pac-review
+   echo "Forced update to v${NEWV}!"
 }
 
 error () {
@@ -181,7 +183,7 @@ error () {
 
 }
 
-case $TYPE in
+case $1 in
    -n|name)name;;
    -u|update)update;;
    -p|push)push;;
