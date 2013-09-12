@@ -162,8 +162,8 @@ error () {
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
-   echo "   1. Your current branch is correct"
-   echo "   2. Your public ssh key is attached to your gerrit profile"
+   echo "   2. Your current branch is correct"
+   echo "   3. Your public ssh key is attached to your gerrit profile"
    echo " "
    echo "If you still encounter problems, ask on the official PAC-man forum at forum.pac-rom.com"
 }
