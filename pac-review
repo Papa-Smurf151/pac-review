@@ -38,10 +38,10 @@ git add -A
    echo "Add commit message below.
 --------------------------"
    read MSSG
-   git commit -a -m "$MSSG"
+   git commit -a -m "${MSSG}"
    git commit --amend
-   read -p "Is there a Change-ID there? (y/n):" RESPi
-case $RESPi in
+   echo -n "Is there a Change-ID there? (y/n):"; read RESPi
+case ${RESPi} in
    y) push ;;
    n) hooks ;;
    *) echo "Canceled"
@@ -152,6 +152,7 @@ update () {
    if [ "${BUILD}" == "${NEWB}" ]; then
       echo; echo "Already up to date (v${VERSION})"
    elif [[ "${BUILD}" -lt "${NEWB}" ]]; then
+      rm -f ${HOME}/.pac/pac-review
       mv ${HOME}/.pac/.new ${HOME}/bin/pac-review
       chmod +x ${HOME}/bin/pac-review
       echo; echo "Successfully updated to v${NEWV}!"
