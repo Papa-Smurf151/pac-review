@@ -23,8 +23,9 @@ fi
 TYPE="$1"
 ap () {
    git add -A
-   read -p "Add commit message below.
-" MSSG
+   echo "Add commit message below.
+-------------------------"
+   read MSSG
    git commit -a -m "$MSSG"
    push
 }
@@ -33,7 +34,8 @@ push () {
  read -p "Are you sure you want to push? (y/n):" RESP
 if [ "$RESP" = "y" ]; then
    rm -rf ~/.pac/branch
-   echo "Please enter the branch you want to upload to (ex. cm-10.2):"
+   echo "Please enter the branch you want to upload to (ex. cm-10.2):
+------------------------------------------------------------"
    read BRANCH
    echo $BRANCH > ~/.pac/branch
    BRANCH=$(cat ~/.pac/branch)
@@ -165,7 +167,8 @@ error () {
    echo "   2. Your current branch is correct"
    echo "   3. Your public ssh key is attached to your gerrit profile"
    echo " "
-   echo "If you still encounter problems, ask on the official PAC-man forum at forum.pac-rom.com"
+   echo "If you still encounter problems, ask on the official PAC-man forum at:"
+
 }
 
 case $TYPE in
