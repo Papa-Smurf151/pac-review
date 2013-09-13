@@ -199,10 +199,8 @@ case $1 in
    -p|push)push;;
    -scp|hooks)hooks;;
    -ssh|sshkey)sshkey;;
-   -h|help)error;;
-   -help|help)error;;
    -ap|add+push)ap;;
    -am|amend)amend;;
    -uf|force)uf;;
-   *|help)error;;
+   -h|help|*)error;;
 esac
