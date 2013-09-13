@@ -6,8 +6,8 @@
 #                                                   #
 #####################################################
 
-VERSION=0.9
-BUILD=9
+VERSION=0.8
+BUILD=8
 
 if [ ! -d ${HOME}/bin ]; then
  mkdir -p ${HOME}/bin
@@ -152,13 +152,16 @@ update () {
    if [ "${BUILD}" == "${NEWB}" ]; then
       echo; echo "Already up to date (v${VERSION})"
    elif [[ "${BUILD}" -lt "${NEWB}" ]]; then
-      rm -f ${HOME}/.pac/pac-review
+      echo -n "Are you sure you want to update to 
+version: ${NEWV} build: ${NEWB}? (y/n): "; read UPn
+  case ${UPn} in
+      n) echo "Update canceled" ;;
+      y) rm -f ${HOME}/.pac/pac-review
       mv ${HOME}/.pac/.new ${HOME}/bin/pac-review
       chmod +x ${HOME}/bin/pac-review
       echo; echo "Successfully updated to v${NEWV}!"
-   else
-      echo "You Cheated!"
-   fi
+   esac
+fi
 }
 
 uf () {
