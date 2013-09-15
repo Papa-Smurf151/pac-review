@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#####################################################
-#                                                   #
-# Created by Sniper/Goldflame09/wedgess for PAC-man #
-#                                                   #
-#####################################################
+###################################################################
+#                                                                 #
+# Created by Sniper/Goldflame09/wedgess/Papa Smurf151 for PAC-man #
+#                                                                 #
+###################################################################
 
 VERSION=0.9
 BUILD=9
@@ -18,16 +18,48 @@ fi
 if [ -f ${HOME}/.pac/username ]; then
    GUZER=`cat ${HOME}/.pac/username`
 else
-   echo "Please enter your gerrit username: ";read GUZER
-   mkdir -p ${HOME}/.pac
-   echo ${GUZER} > ${HOME}/.pac/username
-   GUZER=`cat ${HOME}/.pac/username`
-   echo "Your new gerrit username is: ${GUZER}"
+   echo "Please enter your Gerrit UserName: ";
+   read GUZER
+   echo "Your entered ${GUZER} is this correct"
+   echo "Enter 1 for yes or 2 for no"
+   read correct1
+   if [ ${correct1} -ge 3 -o ${correct1} -eq "" -o ${correct1} -le 0 ] ; then
+		echo "Invalid Entry"
+		echo
+		echo -n "Enter a number between [1 - 2] :"
+		read correct1
+		echo
+   elif [ "${correct1}" -eq 2 ]; then
+		echo "Re-Enter Gerrit UserName :"
+		read GUZER
+   elif [ "${correct1}" -eq 1 ]; then
+		mkdir ~/.pac
+		echo $GUZER > ~/.pac/username
+		USER=$(cat ~/.pac/username)
+		echo "Your new gerrit username is: $(cat ~/.pac/username)"
+	fi
 fi
 
 new_branch() {
    rm -f ${HOME}/.pac/branch
-   echo -n "Please enter the branch you want to upload to (ex. cm-10.2): "; read BRANCH
+   echo -n "Please enter the branch you want to upload to: ";
+   echo "1 for CM-10.1"
+   echo "2 for CM-10.2"
+   echo "3 for GH-pages (for PAC PAPERS Only)"
+   read select1
+   if [ ${select1} -ge 4 -o ${select1} -eq "" -o ${select1} -le 0 ] ; then
+		echo "Invalid Entry"
+		echo
+		echo -n "Enter a number between [1 - 3] :"
+		read select1
+		echo
+   elif [ ${select1} -eq 1 ]; then
+		BRANCH = cm-10.1
+   elif [ ${select1} -eq 2 ]; then
+		BRANCH = cm-10.2
+   elif [ ${select1} -eq 3 ]; then
+		BRANCH = gh-pages
+   fi
    echo ${BRANCH} > ${HOME}/.pac/branch
    BRANCH=`cat ${HOME}/.pac/branch`
    echo "Your new current branch is: ${BRANCH}"
@@ -35,23 +67,35 @@ new_branch() {
 
 ap () {
 git add -A
+scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
    echo "Add commit message below.
 --------------------------"
    read MSSG
-   git commit -a -m "${MSSG}"
-   git commit --amend
-   echo -n "Is there a Change-ID there? (y/n):"; read RESPi
-case ${RESPi} in
-   y) push ;;
-   n) hooks ;;
-   *) echo "Canceled"
-esac   
+   echo "$MSSG"
+   echo
+   echo "Is this correct"
+   echo "Press 1 for Yes and 2 for no"
+   read correct2
+   if [ $correct1 -ge 3 -o $correct2 -eq "" -o $correct2 -le 0 ] ; then
+		echo "Invalid Entry"
+		echo
+		echo -n "Enter a number between [1 - 2] :"
+		read test1
+		echo
+   elif [ correct2 -eq 1 ]; then
+		echo "Commit set to $MSSG"
+   elif [ correct2 -eq 2 ]; then
+		echo "Re-enter commit message"
+		read MSSG
+   fi
+git commit -a -m "${MSSG}"
+echo -n "Are you ready to push? (y/n):"; read RESPi
+push   
 }
 
 push () {
 echo -n "Are you sure you want to push? (y/n): "; read RESP
 if [ "${RESP}" == "y" ] || [ "${RESP}" == "Y" ]; then
-
 	if [ -f ${HOME}/.pac/branch ]; then
   	  echo "Current branch: `cat ${HOME}/.pac/branch`"
   	  echo -n "Push to current branch? (y/n): "; read CTPUSH
@@ -70,35 +114,23 @@ else
 fi
 }
 
-hooks () {
-echo "Adding Commit-ID"
-   scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
-   git commit --amend
-echo -n "Is the Change-ID there? (y/n):"; read RESPc
-case ${RESPc} in
-   y) push ;;
-   n) scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
-   git commit --amend
-echo -n "Is the Change-ID there? (y/n):"; read RESPe 
-case ${RESPe} in
-   y) push ;;
-   n) echo "then please run: 
-{scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/} 
-as something is not working" ;;
-   *) echo "Canceled"
-esac ;;
-   *) echo "Canceled" ;;
-esac
-}
-
 amend () {
    echo -n "Have you edited the files?/Do you want to change commit message? (y/n):"; read RESPa
 if [ "${RESPa}" == "y" ] || [ "${RESPa}" == "Y" ]; then
    git add -A
    git commit --amend
    push
-else
-   echo "Please edit them"
+elif [ "${RESPa}" == "n" ] || [ "${RESPa}" == "N" ]; then
+	echo "Please edit them"
+	echo "Press 1 after you edit them"
+	read amend1
+	if [ ${amend1} -eq 1 ]; then
+		git add -A
+		git commit --amend
+		push
+	elif [ ${amend1} -lt -o -gt 1 ]; then
+		echo "Take your time and come back when ready"
+	fi
 fi
 }
 
@@ -111,10 +143,26 @@ name () {
       1|1.)
          echo "Your current gerrit username is: `cat ~/.pac/username`";;
       2|2.)
-         echo -n "Enter your new gerrit username: "; read GUZER
-         echo ${GUZER} > ${HOME}/.pac/username
-         GUZER=`cat ${HOME}/.pac/username`
-         echo "Your new gerrit username is: ${GUZER}";;
+         echo -n "Enter your new gerrit username: ";
+		 read GUZER
+		 echo "Your entered ${GUZER} is this correct"
+		 echo "Enter 1 for yes or 2 for no"
+		 read correct1
+		 if [ ${correct1} -ge 3 -o ${correct1} -eq "" -o ${correct1} -le 0 ] ; then
+				echo "Invalid Entry"
+				echo
+				echo -n "Enter a number between [1 - 2] :"
+				read correct1
+				echo
+		 elif [ "${correct1}" -eq 2 ]; then
+				echo "Re-Enter Gerrir UserName :"
+				read GUZER
+		 elif [ "${correct1}" -eq 1 ]; then
+				mkdir ~/.pac
+				echo $GUZER > ~/.pac/username
+				USER=$(cat ~/.pac/username)
+				echo "Your new gerrit username is: $(cat ~/.pac/username)"
+		 fi
       *) echo "${NAME} is not a valid option (Choose 1 or 2)";;
    esac
 }
@@ -180,7 +228,6 @@ error () {
    echo "   add+push   	(-ap)  --- Add and push to gerrit"
    echo "   amend  	(-am)  --- Amend the commit and push"
    echo "   force	(-uf)  --- Force the script to grab a new version"
-   echo "   hooks 	(-scp) --- Generate Change-ID for commit"
    echo "   name   	(-n)   --- View or edit your gerrit username"
    echo "   push   	(-p)   --- Push to gerrit"
    echo "   sshkey 	(-ssh) --- Create/show SSH key to put on Gerrit"
@@ -200,7 +247,6 @@ case $1 in
    -n|name)name;;
    -u|update)update;;
    -p|push)push;;
-   -scp|hooks)hooks;;
    -ssh|sshkey)sshkey;;
    -ap|add+push)ap;;
    -am|amend)amend;;
