@@ -32,6 +32,10 @@ else
    elif [ "${correct1}" -eq 2 ]; then
 		echo "Re-Enter Gerrit UserName :"
 		read GUZER
+		mkdir ~/.pac
+		echo $GUZER > ~/.pac/username
+		USER=$(cat ~/.pac/username)
+		echo "Your new gerrit username is: $(cat ~/.pac/username)"
    elif [ "${correct1}" -eq 1 ]; then
 		mkdir ~/.pac
 		echo $GUZER > ~/.pac/username
