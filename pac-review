@@ -27,7 +27,7 @@ else
         1) mkdir -p ${HOME}/.pac;
            echo ${GUZER} > ${HOME}/.pac/username;
            echo "Your new gerrit username is: ${GUZER}";;
-        2) echo -n "Re-Enter Gerrit UserName: "; read GUZER; echo;;
+        2) echo -n "Re-Enter Gerrit UserName: "; read GUZER; echo; mkdir -p ${HOME}/.pac; echo ${GUZER} > ${HOME}/.pac/username; echo "Your new gerrit username is: ${GUZER}";;
         *) clear; echo "Invalid Entry ${correct1}"; echo  "Please enter a number between [1 - 2]"; echo; set_up_user;;
    esac
 fi
