@@ -15,55 +15,39 @@ if [ ! -d ${HOME}/bin ]; then
  echo "export PATH=${PATH}:~/bin" >> ${HOME}/.bashrc
 fi
 
+set_up_user(){
 if [ -f ${HOME}/.pac/username ]; then
    GUZER=`cat ${HOME}/.pac/username`
 else
-   echo "Please enter your Gerrit UserName: ";
-   read GUZER
+   echo -n "Please enter your Gerrit UserName: "; read GUZER
    echo "Your entered ${GUZER} is this correct"
    echo "Enter 1 for yes or 2 for no"
    read correct1
-   if [ ${correct1} -ge 3 -o ${correct1} -eq "" -o ${correct1} -le 0 ] ; then
-		echo "Invalid Entry"
-		echo
-		echo -n "Enter a number between [1 - 2] :"
-		read correct1
-		echo
-   elif [ "${correct1}" -eq 2 ]; then
-		echo "Re-Enter Gerrit UserName :"
-		read GUZER
-		mkdir ~/.pac
-		echo $GUZER > ~/.pac/username
-		USER=$(cat ~/.pac/username)
-		echo "Your new gerrit username is: $(cat ~/.pac/username)"
-   elif [ "${correct1}" -eq 1 ]; then
-		mkdir ~/.pac
-		echo $GUZER > ~/.pac/username
-		USER=$(cat ~/.pac/username)
-		echo "Your new gerrit username is: $(cat ~/.pac/username)"
-	fi
+   case ${correct1} in
+        1) mkdir -p ${HOME}/.pac;
+           echo ${GUZER} > ${HOME}/.pac/username;
+           echo "Your new gerrit username is: ${GUZER}";;
+        2) echo -n "Re-Enter Gerrit UserName: "; read GUZER; echo;;
+        *) clear; echo "Invalid Entry ${correct1}"; echo  "Please enter a number between [1 - 2]"; echo; set_up_user;;
+   esac
 fi
+}
+
+set_up_user
 
 new_branch() {
    rm -f ${HOME}/.pac/branch
-   echo -n "Please enter the branch you want to upload to: ";
+   echo "Please enter the branch you want to upload to:"
    echo "1 for CM-10.1"
    echo "2 for CM-10.2"
    echo "3 for GH-pages (for PAC PAPERS Only)"
    read select1
-   if [ ${select1} -ge 4 -o ${select1} -eq "" -o ${select1} -le 0 ] ; then
-		echo "Invalid Entry"
-		echo
-		echo -n "Enter a number between [1 - 3] :"
-		read select1
-		echo
-   elif [ ${select1} -eq 1 ]; then
-		BRANCH = cm-10.1
-   elif [ ${select1} -eq 2 ]; then
-		BRANCH = cm-10.2
-   elif [ ${select1} -eq 3 ]; then
-		BRANCH = gh-pages
-   fi
+   case ${select1} in
+        1) BRANCH="cm-10.1";;
+        2) BRANCH="cm-10.2";;
+	3) BRANCH="gh-pages";;
+        *) clear; echo "Invalid Entry ${select1}"; echo "Please enter a number between [1 - 3]"; echo; new_branch;;
+   esac
    echo ${BRANCH} > ${HOME}/.pac/branch
    BRANCH=`cat ${HOME}/.pac/branch`
    echo "Your new current branch is: ${BRANCH}"
@@ -80,20 +64,19 @@ scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
    echo "Is this correct"
    echo "Press 1 for Yes and 2 for no"
    read correct2
-   if [ $correct1 -ge 3 -o $correct2 -eq "" -o $correct2 -le 0 ] ; then
+   if [ "${correct2}" != "1" ] || [ "${correct2}" != "2" ]; then
 		echo "Invalid Entry"
 		echo
-		echo -n "Enter a number between [1 - 2] :"
-		read test1
+		echo -n "Enter a number between [1 - 2]: "; read test1
 		echo
-   elif [ correct2 -eq 1 ]; then
-		echo "Commit set to $MSSG"
-   elif [ correct2 -eq 2 ]; then
+   elif [ "${correct2}" == "1" ]; then
+		echo "Commit set to ${MSSG}"
+   elif [ "${correct2}" == "2" ]; then
 		echo "Re-enter commit message"
 		read MSSG
    fi
 git commit -a -m "${MSSG}"
-echo -n "Are you ready to push? (y/n):"; read RESPi
+echo -n "Are you ready to push? (y/n): "; read RESPi
 push   
 }
 
@@ -145,28 +128,28 @@ name () {
    read NAME
    case ${NAME} in
       1|1.)
-         echo "Your current gerrit username is: `cat ~/.pac/username`";;
+	 if [ ! -f ${HOME}/.pac/username ]; then
+           echo "Your current gerrit username is: `cat ${HOME}/.pac/username`"
+	 else
+	   echo "No gerrit username found.."
+	 fi;;
       2|2.)
-         echo -n "Enter your new gerrit username: ";
-		 read GUZER
-		 echo "Your entered ${GUZER} is this correct"
-		 echo "Enter 1 for yes or 2 for no"
-		 read correct1
-		 if [ ${correct1} -ge 3 -o ${correct1} -eq "" -o ${correct1} -le 0 ] ; then
+         echo -n "Enter your new gerrit username: "; read GUZER
+		 echo "Your entered ${GUZER} is this correct?"
+		 echo -n "Enter 1 for yes or 2 for no: "; read correct1
+		 if [ "${correct1}" != "1" ] || [ "${correct1}" != "2" ] ; then
 				echo "Invalid Entry"
 				echo
-				echo -n "Enter a number between [1 - 2] :"
-				read correct1
+				echo -n "Enter a number between [1 - 2]: "; read correct1
 				echo
-		 elif [ "${correct1}" -eq 2 ]; then
-				echo "Re-Enter Gerrir UserName :"
-				read GUZER
-		 elif [ "${correct1}" -eq 1 ]; then
-				mkdir ~/.pac
-				echo $GUZER > ~/.pac/username
-				USER=$(cat ~/.pac/username)
-				echo "Your new gerrit username is: $(cat ~/.pac/username)"
-		 fi ;;
+		 elif [ "${correct1}" == "2" ]; then
+				echo -n "Re-Enter Gerrit UserName: "; read GUZER
+		 elif [ "${correct1}" == "1" ]; then
+				mkdir ${HOME}/.pac
+				echo ${GUZER} > ${HOME}/.pac/username
+				USER=`cat ${HOME}/.pac/username`
+				echo "Your new gerrit username is: ${GUZER}"
+		 fi;;
       *) echo "${NAME} is not a valid option (Choose 1 or 2)";;
    esac
 }
@@ -203,7 +186,7 @@ update () {
    new
    if [ "${BUILD}" == "${NEWB}" ]; then
       echo; echo "Already up to date (v${VERSION})"
-   elif [[ "${BUILD}" -lt "${NEWB}" ]]; then
+   elif [[ "${BUILD}" != "${NEWB}" ]]; then
       echo -n "Are you sure you want to update to 
 version: ${NEWV} build: ${NEWB}? (y/n): "; read UPn
   case ${UPn} in
