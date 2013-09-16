@@ -233,6 +233,7 @@ error () {
    echo "   amend  	(-am)  --- Amend the commit and push"
    echo "   force	(-uf)  --- Force the script to grab a new version"
    echo "   name   	(-n)   --- View or edit your gerrit username"
+   echo "   branch	(-nb)  --- Choose a new branch to push to"
    echo "   push   	(-p)   --- Push to gerrit"
    echo "   sshkey 	(-ssh) --- Create/show SSH key to put on Gerrit"
    echo "   update 	(-u)   --- Check for, and download an update if one is available"
@@ -244,11 +245,13 @@ error () {
    echo " "
    echo "If you still encounter problems, ask on the official PAC-man forum at:"
    echo "http://forum.pac-rom.com . . . . Press Control + Click to open URL"
+   echo " "
 
 }
 
 case $1 in
    -n|name)name;;
+   -nb|branch)new_branch;;
    -u|update)update;;
    -p|push)push;;
    -ssh|sshkey)sshkey;;
