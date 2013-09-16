@@ -162,7 +162,7 @@ name () {
 				echo $GUZER > ~/.pac/username
 				USER=$(cat ~/.pac/username)
 				echo "Your new gerrit username is: $(cat ~/.pac/username)"
-		 fi
+		 fi ;;
       *) echo "${NAME} is not a valid option (Choose 1 or 2)";;
    esac
 }
