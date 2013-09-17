@@ -69,8 +69,7 @@ scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
    read MSSG
    correct_commit
 git commit -a -m "${MSSG}"
-echo -n "Are you ready to push? (y/n): "; read RESPi
-push   
+push
 }
 
 
@@ -123,7 +122,7 @@ echo "Enter 1 for Yes and 2 for No"
    select correct1 in "Yes" "No"; do
    case ${correct1} in
 	Yes ) mkdir ${HOME}/.pac; echo ${GUZER} > ${HOME}/.pac/username; echo "Your new gerrit username is: ${GUZER}"; break;;
-	No ) echo -n "Re-Enter Gerrit UserName: "; read GUZER; break;;
+	No ) echo -n "Re-Enter Gerrit UserName: "; read GUZER; echo; mkdir -p ${HOME}/.pac; echo ${GUZER} > ${HOME}/.pac/username; echo "Your new gerrit username is: ${GUZER}"; break;;
 	* ) clear; echo "Invalid Entry ${correct1}, Please re-try"; echo; echo; correct_gname break ;;
    esac
   done
