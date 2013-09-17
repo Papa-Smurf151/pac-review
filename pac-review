@@ -35,12 +35,12 @@ new_branch() {
    echo "1 for CM-10.1"
    echo "2 for CM-10.2"
    echo "3 for GH-pages (for PAC PAPERS Only)"
-   select correct3 in "Yes" "No"; do
-     case ${select3} in
-        1) BRANCH="cm-10.1"; break;;
-        2) BRANCH="cm-10.2"; break;;
-	3) BRANCH="gh-pages"; break;;
-        *) clear; echo "Invalid Entry ${correct3}, Please enter a number between [1 - 3]"; echo; new_branch; break;;
+   select correct3 in "CM-10.1" "CM-10.2" "GH-PAGES"; do
+     case ${correct3} in
+        CM-10.1 ) BRANCH="cm-10.1"; break;;
+        CM-10.2 ) BRANCH="cm-10.2"; break;;
+        GH-PAGES ) BRANCH="gh-pages"; break;;
+        * ) clear; echo "Invalid Entry ${correct3}, Please enter from the options provided."; echo; echo; new_branch; break;;
      esac
    done
    echo ${BRANCH} > ${HOME}/.pac/branch
