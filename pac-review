@@ -64,7 +64,7 @@ scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
    echo "Is this correct"
    echo "Press 1 for Yes and 2 for no"
    read correct2
-   if [ "${correct2}" != "1" ] || [ "${correct2}" != "2" ]; then
+   if [ "${correct2}" != "1" ] && [ "${correct2}" != "2" ]; then
 		echo "Invalid Entry"
 		echo
 		echo -n "Enter a number between [1 - 2]: "; read test1
