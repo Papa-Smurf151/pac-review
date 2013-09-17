@@ -9,31 +9,25 @@
 VERSION=0.9
 BUILD=9
 
-if [ ! -d ${HOME}/bin ]; then
- mkdir -p ${HOME}/bin
- echo "# Add ~/bin to PATH" >> ${HOME}/.bashrc
- echo "export PATH=${PATH}:~/bin" >> ${HOME}/.bashrc
-fi
-
 set_up_user(){
 if [ -f ${HOME}/.pac/username ]; then
    GUZER=`cat ${HOME}/.pac/username`
 else
    echo -n "Please enter your Gerrit UserName: "; read GUZER
    echo "Your entered ${GUZER} is this correct"
-   echo "Enter 1 for yes or 2 for no"
-   read correct1
+   echo "Enter 1 for Yes or 2 for No"
+   select correct1 in "Yes" "No"; do
    case ${correct1} in
-        1) mkdir -p ${HOME}/.pac;
-           echo ${GUZER} > ${HOME}/.pac/username;
-           echo "Your new gerrit username is: ${GUZER}";;
-        2) echo -n "Re-Enter Gerrit UserName: "; read GUZER; echo; mkdir -p ${HOME}/.pac; echo ${GUZER} > ${HOME}/.pac/username; echo "Your new gerrit username is: ${GUZER}";;
-        *) clear; echo "Invalid Entry ${correct1}"; echo  "Please enter a number between [1 - 2]"; echo; set_up_user;;
+        Yes ) mkdir -p ${HOME}/.pac;
+              echo ${GUZER} > ${HOME}/.pac/username;
+              echo "Your new gerrit username is: ${GUZER}"; break;;
+        No ) echo -n "Re-Enter Gerrit UserName: "; read GUZER; echo; mkdir -p ${HOME}/.pac; echo ${GUZER} > ${HOME}/.pac/username; echo "Your new gerrit username is: ${GUZER}"; break;;
+        *) clear; echo "Invalid Entry ${correct1}, Please enter a number between [1 - 2]"; echo; set_up_user; break;;
    esac
+ done
 fi
 }
 
-set_up_user
 
 new_branch() {
    rm -f ${HOME}/.pac/branch
@@ -41,16 +35,30 @@ new_branch() {
    echo "1 for CM-10.1"
    echo "2 for CM-10.2"
    echo "3 for GH-pages (for PAC PAPERS Only)"
-   read select1
-   case ${select1} in
-        1) BRANCH="cm-10.1";;
-        2) BRANCH="cm-10.2";;
-	3) BRANCH="gh-pages";;
-        *) clear; echo "Invalid Entry ${select1}"; echo "Please enter a number between [1 - 3]"; echo; new_branch;;
-   esac
+   select correct3 in "Yes" "No"; do
+     case ${select3} in
+        1) BRANCH="cm-10.1"; break;;
+        2) BRANCH="cm-10.2"; break;;
+	3) BRANCH="gh-pages"; break;;
+        *) clear; echo "Invalid Entry ${correct3}, Please enter a number between [1 - 3]"; echo; new_branch; break;;
+     esac
+   done
    echo ${BRANCH} > ${HOME}/.pac/branch
    BRANCH=`cat ${HOME}/.pac/branch`
    echo "Your new current branch is: ${BRANCH}"
+}
+
+correct_commit() {
+clear; echo ${MSSG}; echo
+echo "Is this correct ??"
+echo "Enter 1 for Yes and 2 for No"
+  select correct2 in "Yes" "No"; do
+   case ${correct2} in
+	Yes ) echo "Commit set to ${MSSG}"; break;;
+	No ) echo "Re-enter commit message"; read MSSG; break;;
+	* ) clear; echo "Invalid Entry ${correct2}, Please re-try"; echo; echo; correct_commit; break ;;
+   esac
+  done
 }
 
 ap () {
@@ -59,26 +67,12 @@ scp -p -P 29418 ${GUZER}@review.pac-rom.com:hooks/commit-msg .git/hooks/
    echo "Add commit message below.
 --------------------------"
    read MSSG
-   echo "$MSSG"
-   echo
-   echo "Is this correct"
-   echo "Press 1 for Yes and 2 for no"
-   read correct2
-   if [ "${correct2}" != "1" ] && [ "${correct2}" != "2" ]; then
-		echo "Invalid Entry"
-		echo
-		echo -n "Enter a number between [1 - 2]: "; read test1
-		echo
-   elif [ "${correct2}" == "1" ]; then
-		echo "Commit set to ${MSSG}"
-   elif [ "${correct2}" == "2" ]; then
-		echo "Re-enter commit message"
-		read MSSG
-   fi
+   correct_commit
 git commit -a -m "${MSSG}"
 echo -n "Are you ready to push? (y/n): "; read RESPi
 push   
 }
+
 
 push () {
 echo -n "Are you sure you want to push? (y/n): "; read RESP
@@ -101,6 +95,7 @@ else
 fi
 }
 
+
 amend () {
    echo -n "Have you edited the files?/Do you want to change commit message? (y/n):"; read RESPa
 if [ "${RESPa}" == "y" ] || [ "${RESPa}" == "Y" ]; then
@@ -111,48 +106,52 @@ elif [ "${RESPa}" == "n" ] || [ "${RESPa}" == "N" ]; then
 	echo "Please edit them"
 	echo "Press 1 after you edit them"
 	read amend1
-	if [ ${amend1} -eq 1 ]; then
+	if [ ${amend1} == "1" ]; then
 		git add -A
 		git commit --amend
 		push
-	elif [ ${amend1} -lt -o -gt 1 ]; then
-		echo "Take your time and come back when ready"
+	else
+		echo "Take your time and come back when you are ready"
 	fi
 fi
 }
+
+
+correct_gname() {
+echo "Your entered ${GUZER} is this correct?"
+echo "Enter 1 for Yes and 2 for No"
+   select correct1 in "Yes" "No"; do
+   case ${correct1} in
+	Yes ) mkdir ${HOME}/.pac; echo ${GUZER} > ${HOME}/.pac/username; echo "Your new gerrit username is: ${GUZER}"; break;;
+	No ) echo -n "Re-Enter Gerrit UserName: "; read GUZER; break;;
+	* ) clear; echo "Invalid Entry ${correct1}, Please re-try"; echo; echo; correct_gname break ;;
+   esac
+  done
+}
+
+
+nameq_question() {
+  select NAME in "View" "New"; do
+   case ${NAME} in
+      View ) if [ -f ${HOME}/.pac/username ]; then
+           echo "Your current gerrit username is: ${GUZER}";
+	  else
+	   echo "No gerrit username found..";
+	  fi; break;;
+      New ) echo -n "Enter your new gerrit username: "; read GUZER; correct_gname; break;;
+      * ) clear; echo "${NAME} is not a valid option (Choose 1 or 2)"; nameq_question; break;;
+   esac
+  done
+}
+
 
 name () {
    echo "Enter an option:"
    echo "   1. View your current gerrit username"
    echo "   2. Enter a new gerrit username"
-   read NAME
-   case ${NAME} in
-      1|1.)
-	 if [ ! -f ${HOME}/.pac/username ]; then
-           echo "Your current gerrit username is: `cat ${HOME}/.pac/username`"
-	 else
-	   echo "No gerrit username found.."
-	 fi;;
-      2|2.)
-         echo -n "Enter your new gerrit username: "; read GUZER
-		 echo "Your entered ${GUZER} is this correct?"
-		 echo -n "Enter 1 for yes or 2 for no: "; read correct1
-		 if [ "${correct1}" != "1" ] || [ "${correct1}" != "2" ] ; then
-				echo "Invalid Entry"
-				echo
-				echo -n "Enter a number between [1 - 2]: "; read correct1
-				echo
-		 elif [ "${correct1}" == "2" ]; then
-				echo -n "Re-Enter Gerrit UserName: "; read GUZER
-		 elif [ "${correct1}" == "1" ]; then
-				mkdir ${HOME}/.pac
-				echo ${GUZER} > ${HOME}/.pac/username
-				USER=`cat ${HOME}/.pac/username`
-				echo "Your new gerrit username is: ${GUZER}"
-		 fi;;
-      *) echo "${NAME} is not a valid option (Choose 1 or 2)";;
-   esac
+   echo; nameq_question
 }
+
 
 sshkey () {
 if [ -e ${HOME}/.ssh/id_rsa.pub ]; then
@@ -175,6 +174,7 @@ read -p "Press [Enter] to open file..."
 fi
 }
 
+
 new () {
    curl http://pac-rom.com/downloads/pac-review > ${HOME}/.pac/.new
    sed -i '12,132d' ${HOME}/.pac/.new
@@ -182,20 +182,23 @@ new () {
    NEWV=`grep VERSION= ${HOME}/.pac/.new | sed "s/VERSION=//g"`
 }
 
+ask_the_question() {
+echo -n "Are you sure you want to update to version: ${NEWV} build: ${NEWB}? (yes/no)"
+select correct4 in "Yes" "No"; do
+  case ${correct4} in
+      Yes ) rm -f ${HOME}/.pac/pac-review; mv ${HOME}/.pac/.new ${HOME}/bin/pac-review; chmod +x ${HOME}/bin/pac-review; echo; echo "Successfully updated to v${NEWV}!"; break;;
+      No ) echo "Update canceled"; break ;;
+      * ) clear; echo "Invalid option ${correct4}, Please try again..."; echo; ask_the_question; break;;
+   esac
+done
+}
+
 update () {
    new
    if [ "${BUILD}" == "${NEWB}" ]; then
       echo; echo "Already up to date (v${VERSION})"
    elif [[ "${BUILD}" != "${NEWB}" ]]; then
-      echo -n "Are you sure you want to update to 
-version: ${NEWV} build: ${NEWB}? (y/n): "; read UPn
-  case ${UPn} in
-      n) echo "Update canceled" ;;
-      y) rm -f ${HOME}/.pac/pac-review
-      mv ${HOME}/.pac/.new ${HOME}/bin/pac-review
-      chmod +x ${HOME}/bin/pac-review
-      echo; echo "Successfully updated to v${NEWV}!"
-   esac
+      ask_the_question
 fi
 }
 
@@ -231,6 +234,15 @@ error () {
    echo " "
 
 }
+
+
+if [ ! -d ${HOME}/bin ]; then
+ mkdir -p ${HOME}/bin
+ echo "# Add ~/bin to PATH" >> ${HOME}/.bashrc
+ echo "export PATH=${PATH}:~/bin" >> ${HOME}/.bashrc
+fi
+
+set_up_user
 
 case $1 in
    -n|name)name;;
