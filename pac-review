@@ -32,9 +32,7 @@ fi
 new_branch() {
    rm -f ${HOME}/.pac/branch
    echo "Please enter the branch you want to upload to:"
-   echo "1 for CM-10.1"
-   echo "2 for CM-10.2"
-   echo "3 for GH-pages (for PAC PAPERS Only)"
+   echo "GH-PAGES is ONLY for PacPapers!!"
    select correct3 in "CM-10.1" "CM-10.2" "GH-PAGES"; do
      case ${correct3} in
         CM-10.1 ) BRANCH="cm-10.1"; break;;
