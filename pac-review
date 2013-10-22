@@ -222,6 +222,7 @@ error () {
    echo "Commands:"
    echo "   add+push   	(-ap)  --- Add and push to gerrit"
    echo "   amend  	(-am)  --- Amend the commit and push"
+   echo "   author      (-au)  --- Change author of commit"
    echo "   force	(-uf)  --- Force the script to grab a new version"
    echo "   name   	(-n)   --- View or edit your gerrit username"
    echo "   branch	(-nb)  --- Choose a new branch to push to"
