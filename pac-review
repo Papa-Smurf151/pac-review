@@ -114,6 +114,14 @@ fi
 }
 
 
+author () {
+echo "Please enter username of author"
+echo -n "Username: "
+read auser
+git commit --amend --author ${auser}
+}
+
+
 correct_gname() {
 echo "Your entered ${GUZER} is this correct?"
 echo "Enter 1 for Yes and 2 for No"
