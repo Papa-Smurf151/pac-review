@@ -6,8 +6,8 @@
 #                                                                 #
 ###################################################################
 
-VERSION=0.9
-BUILD=9
+VERSION=1.1
+BUILD=11
 
 set_up_user(){
 if [ -f ${HOME}/.pac/username ]; then
@@ -33,10 +33,11 @@ new_branch() {
    rm -f ${HOME}/.pac/branch
    echo "Please enter the branch you want to upload to:"
    echo "GH-PAGES is ONLY for PacPapers!!"
-   select correct3 in "CM-10.1" "CM-10.2" "GH-PAGES"; do
+   select correct3 in "CM-10.1" "CM-10.2" "PAC-4.4" "GH-PAGES"; do
      case ${correct3} in
         CM-10.1 ) BRANCH="cm-10.1"; break;;
         CM-10.2 ) BRANCH="cm-10.2"; break;;
+        PAC-4.4 ) BRANCH="pac-4.4"; break;;
         GH-PAGES ) BRANCH="gh-pages"; break;;
         * ) clear; echo "Invalid Entry ${correct3}, Please enter from the options provided."; echo; echo; new_branch; break;;
      esac
@@ -114,14 +115,6 @@ fi
 }
 
 
-author () {
-echo "Please enter username of author"
-echo -n "Username: "
-read auser
-git commit --amend --author ${auser}
-}
-
-
 correct_gname() {
 echo "Your entered ${GUZER} is this correct?"
 echo "Enter 1 for Yes and 2 for No"
@@ -181,17 +174,18 @@ fi
 
 
 new () {
-   curl http://pac-rom.com/downloads/pac-review > ${HOME}/.pac/.new
-   sed -i '12,132d' ${HOME}/.pac/.new
-   NEWB=`grep BUILD= ${HOME}/.pac/.new | sed "s/BUILD=//g"`
-   NEWV=`grep VERSION= ${HOME}/.pac/.new | sed "s/VERSION=//g"`
+   wget -q -O ${HOME}/.pac/.new http://pac-rom.com/downloads/pac-review
+   cp ${HOME}/.pac/.new ${HOME}/.pac/.new2
+   sed -i '12,261d' ${HOME}/.pac/.new
+   NEWB=(`grep BUILD= ${HOME}/.pac/.new | sed "s/BUILD=//g"`)
+   NEWV=(`grep VERSION= ${HOME}/.pac/.new | sed "s/VERSION=//g"`)
 }
 
 ask_the_question() {
-echo -n "Are you sure you want to update to version: ${NEWV} build: ${NEWB}? (yes/no)"
+echo "Are you sure you want to update to version: ${NEWV} build: ${NEWB}? (yes/no)"
 select correct4 in "Yes" "No"; do
   case ${correct4} in
-      Yes ) rm -f ${HOME}/.pac/pac-review; mv ${HOME}/.pac/.new ${HOME}/bin/pac-review; chmod +x ${HOME}/bin/pac-review; echo; echo "Successfully updated to v${NEWV}!"; break;;
+      Yes ) rm -f ${HOME}/.pac/pac-review; mv ${HOME}/.pac/.new2 ${HOME}/bin/pac-review; chmod +x ${HOME}/bin/pac-review; echo; echo "Successfully updated to v${NEWV}!"; break;;
       No ) echo "Update canceled"; break ;;
       * ) clear; echo "Invalid option ${correct4}, Please try again..."; echo; ask_the_question; break;;
    esac
@@ -209,7 +203,7 @@ fi
 
 uf () {
    new
-   mv ${HOME}/.pac/.new ${HOME}/bin/pac-review
+   mv ${HOME}/.pac/.new2 ${HOME}/bin/pac-review
    chmod +x ${HOME}/bin/pac-review
    echo "Forced update to v${NEWV}!"
 }
@@ -222,13 +216,13 @@ error () {
    echo "Commands:"
    echo "   add+push   	(-ap)  --- Add and push to gerrit"
    echo "   amend  	(-am)  --- Amend the commit and push"
-   echo "   author      (-au)  --- Change author of commit"
    echo "   force	(-uf)  --- Force the script to grab a new version"
    echo "   name   	(-n)   --- View or edit your gerrit username"
    echo "   branch	(-nb)  --- Choose a new branch to push to"
    echo "   push   	(-p)   --- Push to gerrit"
    echo "   sshkey 	(-ssh) --- Create/show SSH key to put on Gerrit"
    echo "   update 	(-u)   --- Check for, and download an update if one is available"
+   echo "   version     (-v)   --- Check the current version"
    echo " "
    echo "If you encounter problems, check if:"
    echo "   1. Your gerrit username is correct (using the name option)"
@@ -238,7 +232,10 @@ error () {
    echo "If you still encounter problems, ask on the official PAC-man forum at:"
    echo "http://forum.pac-rom.com . . . . Press Control + Click to open URL"
    echo " "
+}
 
+version () {
+   echo "Current version: ${VERSION}"
 }
 
 
@@ -259,5 +256,6 @@ case $1 in
    -ap|add+push)ap;;
    -am|amend)amend;;
    -uf|force)uf;;
+   -v|version)version;;
    -h|help|*)error;;
 esac
