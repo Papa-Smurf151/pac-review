@@ -87,9 +87,11 @@ if [ "${RESP}" == "y" ] || [ "${RESP}" == "Y" ]; then
 	  new_branch
 	fi
     PROJECT=`grep PAC-man .git/config | awk -F/ '{print $NF}'`
-    git push ssh://${GUZER}@review.pac-rom.com:29418/${PROJECT} HEAD:refs/\for/${BRANCH}
+    echo -n "Push as Draft? (y/n): "; read DRAFT
+    if [ "${DRAFT}" == "y" ] || [ "${DRAFT}" == "Y" ]; then
+    git push ssh://${GUZER}@review.pac-rom.com:29418/${PROJECT} HEAD:refs/\drafts/${BRANCH}
 else
-  echo "Canceled"
+    git push ssh://${GUZER}@review.pac-rom.com:29418/${PROJECT} HEAD:refs/${BRANCH}
 fi
 }
 
