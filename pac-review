@@ -38,7 +38,7 @@ new_branch() {
         PAC-5.1 ) BRANCH="pac-5.1"; break;;
         PAC-6.0 ) BRANCH="pac-6.0"; break;;
         GH-PAGES ) BRANCH="gh-pages"; break;;
-		CUSTOM ) echo -n "Please enter custom branch: "; read BRANCH
+	CUSTOM ) echo -n "Please enter custom branch: "; read BRANCH
         * ) clear; echo "Invalid Entry ${correct3}, Please enter from the options provided."; echo; echo; new_branch; break;;
      esac
    done
