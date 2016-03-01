@@ -6,8 +6,8 @@
 #                                                                 #
 ###################################################################
 
-VERSION=1.1
-BUILD=11
+VERSION=2
+BUILD=12
 
 set_up_user(){
 if [ -f ${HOME}/.pac/username ]; then
@@ -33,12 +33,12 @@ new_branch() {
    rm -f ${HOME}/.pac/branch
    echo "Please enter the branch you want to upload to:"
    echo "GH-PAGES is ONLY for PacPapers!!"
-   select correct3 in "CM-10.1" "CM-10.2" "PAC-4.4" "GH-PAGES"; do
+   select correct3 in "PAC-5.1" "PAC-6.0" "GH-PAGES" "CUSTOM"; do
      case ${correct3} in
-        CM-10.1 ) BRANCH="cm-10.1"; break;;
-        CM-10.2 ) BRANCH="cm-10.2"; break;;
-        PAC-4.4 ) BRANCH="pac-4.4"; break;;
+        PAC-5.1 ) BRANCH="pac-5.1"; break;;
+        PAC-6.0 ) BRANCH="pac-6.0"; break;;
         GH-PAGES ) BRANCH="gh-pages"; break;;
+		CUSTOM ) echo -n "Please enter custom branch: "; read BRANCH
         * ) clear; echo "Invalid Entry ${correct3}, Please enter from the options provided."; echo; echo; new_branch; break;;
      esac
    done
@@ -177,7 +177,7 @@ fi
 
 
 new () {
-   wget -q -O ${HOME}/.pac/.new http://pac-rom.com/downloads/pac-review
+   wget -q -O ${HOME}/.pac/.new https://raw.githubusercontent.com/Goldflame09/gerritpush/master/pac-review
    cp ${HOME}/.pac/.new ${HOME}/.pac/.new2
    sed -i '12,261d' ${HOME}/.pac/.new
    NEWB=(`grep BUILD= ${HOME}/.pac/.new | sed "s/BUILD=//g"`)
